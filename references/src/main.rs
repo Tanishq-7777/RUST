@@ -27,3 +27,9 @@ fn change(some_string : &mut String) {
     let r3 = &mut s; // no problem
     println!("{r3}");
 }
+fn dangle() -> String {
+    let s = String::from("hello");
+    // &s  -> this will give us an error that you can not return a opinter pointing invalid memory 
+    // solution is to directly return the string s and give its ownership to someone else;
+    s
+}
