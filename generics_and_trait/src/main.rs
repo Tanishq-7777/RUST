@@ -46,6 +46,7 @@ fn main() {
     let arr: [i64; 4] = [5,6,7,8];
     let my_sum = calculate_generic_sum(&arr);
     println!("{my_sum}");
+    let a = 10;
 
 
     // ! There is no inheritance in rust but still rust developers don't miss it why?
