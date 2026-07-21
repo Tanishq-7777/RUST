@@ -1,4 +1,4 @@
-use std::ops::AddAssign;
+use std::{fmt::Display, ops::AddAssign};
 
 trait Sellable {
     fn price(&self) -> u16;
@@ -9,15 +9,35 @@ struct Sword {
     damage:u16,
     swing_time_ms:u16,
 }
+impl Sellable for Sword{
+    fn price(&self) -> u16 {
+        self.damage * 10
+    }
+    fn description(&self) -> String {
+        self.name.clone()
+    }
+}
 struct Shield {
     name:String,
     armor:u16,
     block:u16,
 }
+impl Sellable for Shield{
+    fn price(&self) -> u16 {
+        self.armor * 5
+    }
+    fn description(&self) -> String {
+        self.name.clone()
+    }
+}
 
 fn vendor_text_static<T: Sellable>(item :&T) -> String {
-    format!("I offer you: {}",item.description())
+    format!("I offer you: {} for price {}",item.description(),item.price())
 }
+fn vendor_text_dynamic(item :&dyn Sellable) -> String {
+    format!("I offer you: {} for price {}",item.description(),item.price())
+}
+
 fn main() {
     // You have 2 arrays and you have to compute the sum of both the array
     let my_nums = [1,2,3,4];
@@ -46,7 +66,6 @@ fn main() {
     let arr: [i64; 4] = [5,6,7,8];
     let my_sum = calculate_generic_sum(&arr);
     println!("{my_sum}");
-    let a = 10;
 
 
     // ! There is no inheritance in rust but still rust developers don't miss it why?
@@ -60,8 +79,30 @@ fn main() {
         armor:30,
         block:18,
     };
+    let vendor1 = vendor_text_static(&shield);
+    let vendor2 = vendor_text_static(&sword);
+    println!("{vendor1}");
+    println!("{vendor2}");
+    // ! Now supose you want a collection of sellable items like sometime sword and sometime shield then how will you do that? -> For this we have a concept of trait objects
+    // ! Now see size of Sellable obejct can be different for different types so we can't have a vector of sellable objects but we can have a vector of references to sellable objects because reference has a fixed size.
+    // ! and we use dyn keyword to tell rust that we don't know the type of object but we know that it implements the trait Sellable
+    let sellables:Vec<&dyn Sellable> = vec![&sword,&shield];
+    for item in sellables {
+        println!("{}",vendor_text_dynamic(item));
+    }
 
-
+    let box_trait_obj: Vec<Box<dyn Sellable>> = vec![Box::new(Shield {
+        name:"Shield of warrior".into(),
+        armor:30,
+        block:18,
+    }),Box::new(Sword {
+        name:"Sword of warrior".into(),
+        damage:18,
+        swing_time_ms:20,
+    })];
+    for item in box_trait_obj {
+        println!("{}",vendor_text_dynamic(item.as_ref()));
+    }
 }
 fn calculate_sum(nums :&[i32]) -> i32 {
     let mut sum = 0;
